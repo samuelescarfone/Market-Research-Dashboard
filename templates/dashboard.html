@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Catalyst Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+        }
+        
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 0 2rem;
+        }
+        
+        select, button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.9rem;
+        }
+        
+        button {
+            background: #007aff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            padding: 0 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .events-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .events-panel h3 {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: #1d1d1f;
+        }
+        
+        .event-item {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #007aff;
+            background: #f8f9fa;
+        }
+        
+        .event-source {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #007aff;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+        
+        .event-date {
+            font-size: 0.75rem;
+            color: #86868b;
+            margin-bottom: 0.25rem;
+        }
+        
+        .event-text {
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #86868b;
+        }
+        
+        .source-nhtsa { border-left-color: #ff3b30; }
+        .source-fda-drug { border-left-color: #ff9500; }
+        .source-sec { border-left-color: #34c759; }
+        
+        .source-nhtsa .event-source { color: #ff3b30; }
+        .source-fda-drug .event-source { color: #ff9500; }
+        .source-sec .event-source { color: #34c759; }
+        
+        .tabs {
+            display: flex;
+            background: white;
+            margin: 0 2rem 2rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 1rem 2rem;
+            border: none;
+            background: white;
+            color: #86868b;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .tab-button:hover {
+            background: #f8f9fa;
+            color: #1d1d1f;
+        }
+        
+        .tab-button.active {
+            background: #007aff;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .data-table-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 0 2rem;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e5e7;
+        }
+        
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #1d1d1f;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .data-table td {
+            font-size: 0.9rem;
+            vertical-align: top;
+        }
+        
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .ticker-badge {
+            display: inline-block;
+            background: #007aff;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .source-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .source-badge.sec { background: #34c759; color: white; }
+        .source-badge.fda-drug { background: #ff9500; color: white; }
+        .source-badge.fda-device { background: #ff9500; color: white; }
+        .source-badge.nhtsa { background: #ff3b30; color: white; }
+        
+        .event-link {
+            color: #007aff;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+        
+        .event-link:hover {
+            text-decoration: underline;
+        }
+        
+        .date-cell {
+            white-space: nowrap;
+            color: #86868b;
+            font-size: 0.85rem;
+        }
+        
+        .filing-type-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #5856d6;
+            color: white;
+        }
+        
+        .insider-cell {
+            font-size: 0.85rem;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .transaction-cell {
+            font-size: 0.85rem;
+            font-weight: 500;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .transaction-cell:hover {
+            white-space: normal;
+            overflow: visible;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Company Catalyst Dashboard</h1>
+        <p>Regulatory events overlaid on stock price charts</p>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab-button active" onclick="showTab('chart')">Stock Chart</button>
+        <button class="tab-button" onclick="showTab('sec')">SEC Filings</button>
+        <button class="tab-button" onclick="showTab('fda')">FDA Events</button>
+        <button class="tab-button" onclick="showTab('nhtsa')">Vehicle Recalls</button>
+    </div>
+    
+    <!-- Chart Tab -->
+    <div id="chartTab" class="tab-content active">
+        <div class="controls">
+            <select id="tickerSelect">
+                <option value="">Select Company...</option>
+            </select>
+            <select id="timeRange">
+                <option value="30">30 Days</option>
+                <option value="90" selected>90 Days</option>
+                <option value="180">180 Days</option>
+                <option value="365">1 Year</option>
+            </select>
+            <button onclick="loadData()">Load Data</button>
+        </div>
+        
+        <div class="dashboard">
+            <div class="chart-container">
+                <canvas id="stockChart" width="800" height="400"></canvas>
+            </div>
+            
+            <div class="events-panel">
+                <h3>Recent Events</h3>
+                <div id="eventsList">
+                    <div class="loading">Select a company to view events</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SEC Filings Tab -->
+    <div id="secTab" class="tab-content">
+        <div class="controls">
+            <select id="secTimeRange">
+                <option value="30">30 Days</option>
+                <option value="90" selected>90 Days</option>
+                <option value="180">180 Days</option>
+                <option value="365">1 Year</option>
+            </select>
+            <button onclick="loadSecFilings()">Load SEC Filings</button>
+        </div>
+        
+        <div class="data-table-container">
+            <h3>SEC Filings (8-K & Form 4)</h3>
+            <div id="secTable">
+                <div class="loading">Click "Load SEC Filings" to view data</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- FDA Events Tab -->
+    <div id="fdaTab" class="tab-content">
+        <div class="controls">
+            <select id="fdaTimeRange">
+                <option value="30">30 Days</option>
+                <option value="90" selected>90 Days</option>
+                <option value="180">180 Days</option>
+                <option value="365">1 Year</option>
+            </select>
+            <button onclick="loadFdaEvents()">Load FDA Events</button>
+        </div>
+        
+        <div class="data-table-container">
+            <h3>FDA Adverse Events (Drug & Device)</h3>
+            <div id="fdaTable">
+                <div class="loading">Click "Load FDA Events" to view data</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- NHTSA Recalls Tab -->
+    <div id="nhtsaTab" class="tab-content">
+        <div class="controls">
+            <select id="nhtsaTimeRange">
+                <option value="30">30 Days</option>
+                <option value="90" selected>90 Days</option>
+                <option value="180">180 Days</option>
+                <option value="365">1 Year</option>
+            </select>
+            <button onclick="loadNhtsaRecalls()">Load Vehicle Recalls</button>
+        </div>
+        
+        <div class="data-table-container">
+            <h3>NHTSA Vehicle Recalls</h3>
+            <div id="nhtsaTable">
+                <div class="loading">Click "Load Vehicle Recalls" to view data</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let stockChart = null;
+        
+        // Load companies on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCompanies();
+        });
+        
+        async function loadCompanies() {
+            try {
+                const response = await fetch('/api/companies');
+                const companies = await response.json();
+                
+                const select = document.getElementById('tickerSelect');
+                select.innerHTML = '<option value="">Select Company...</option>';
+                
+                companies.forEach(company => {
+                    const option = document.createElement('option');
+                    option.value = company.ticker;
+                    option.textContent = `${company.ticker} - ${company.company}`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading companies:', error);
+            }
+        }
+        
+        async function loadData() {
+            const ticker = document.getElementById('tickerSelect').value;
+            const days = document.getElementById('timeRange').value;
+            
+            if (!ticker) {
+                alert('Please select a company');
+                return;
+            }
+            
+            document.getElementById('eventsList').innerHTML = '<div class="loading">Loading...</div>';
+            
+            try {
+                // Load chart data (stock + events)
+                const chartResponse = await fetch(`/api/chart-data/${ticker}?days=${days}`);
+                const chartData = await chartResponse.json();
+                
+                updateChart(chartData.stock, chartData.events, ticker);
+                updateEventsList(chartData.events);
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('eventsList').innerHTML = '<div class="loading">Error loading data</div>';
+            }
+        }
+        
+        function updateChart(stockData, eventsData, ticker) {
+            const ctx = document.getElementById('stockChart').getContext('2d');
+            
+            if (stockChart) {
+                stockChart.destroy();
+            }
+            
+            // Prepare stock price data
+            const labels = stockData.map(d => d.date);
+            const prices = stockData.map(d => d.close);
+            
+            // Prepare event annotations
+            const eventAnnotations = {};
+            eventsData.forEach(event => {
+                if (event.date && stockData.find(s => s.date === event.date)) {
+                    if (!eventAnnotations[event.date]) {
+                        eventAnnotations[event.date] = [];
+                    }
+                    eventAnnotations[event.date].push(event);
+                }
+            });
+            
+            stockChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `${ticker} Stock Price`,
+                        data: prices,
+                        borderColor: '#007aff',
+                        backgroundColor: 'rgba(0, 122, 255, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Price ($)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${ticker} Stock Price with Catalyst Events`
+                        },
+                        tooltip: {
+                            callbacks: {
+                                afterBody: function(context) {
+                                    const date = context[0].label;
+                                    const events = eventAnnotations[date];
+                                    if (events && events.length > 0) {
+                                        return events.map(e => `${e.source}: ${e.text}`);
+                                    }
+                                    return [];
+                                }
+                            }
+                        }
+                    },
+                    elements: {
+                        point: {
+                            backgroundColor: function(context) {
+                                const date = labels[context.dataIndex];
+                                return eventAnnotations[date] ? '#ff3b30' : '#007aff';
+                            },
+                            borderColor: function(context) {
+                                const date = labels[context.dataIndex];
+                                return eventAnnotations[date] ? '#ff3b30' : '#007aff';
+                            },
+                            radius: function(context) {
+                                const date = labels[context.dataIndex];
+                                return eventAnnotations[date] ? 6 : 3;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateEventsList(events) {
+            const container = document.getElementById('eventsList');
+            
+            if (events.length === 0) {
+                container.innerHTML = '<div class="loading">No events found for this period</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            events.forEach(event => {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = `event-item source-${event.source.toLowerCase().replace('-', '-')}`;
+                
+                eventDiv.innerHTML = `
+                    <div class="event-source">${event.source}</div>
+                    <div class="event-date">${event.date}</div>
+                    <div class="event-text">${event.text}</div>
+                `;
+                
+                container.appendChild(eventDiv);
+            });
+        }
+        
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+        
+        // Load SEC filings
+        async function loadSecFilings() {
+            const days = document.getElementById('secTimeRange').value;
+            const container = document.getElementById('secTable');
+            
+            container.innerHTML = '<div class="loading">Loading SEC filings...</div>';
+            
+            try {
+                const response = await fetch(`/api/sec-filings?days=${days}`);
+                const filings = await response.json();
+                
+                if (filings.length === 0) {
+                    container.innerHTML = '<div class="loading">No SEC filings found for this period</div>';
+                    return;
+                }
+                
+                let tableHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Ticker</th>
+                                <th>Company</th>
+                                <th>Filing Type</th>
+                                <th>Insider</th>
+                                <th>Transaction</th>
+                                <th>Link</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                filings.forEach(filing => {
+                    const date = filing.timestamp ? filing.timestamp.split('T')[0] : 'N/A';
+                    const link = filing.link ? `<a href="${filing.link}" target="_blank" class="event-link">View Filing</a>` : 'N/A';
+                    
+                    // Extract filing type from event_text
+                    let filingType = filing.event_text;
+                    if (filing.event_text.includes('Form 4:')) {
+                        filingType = 'Form 4';
+                    } else if (filing.event_text.includes('8-K')) {
+                        filingType = '8-K';
+                    }
+                    
+                    const insider = filing.insider_name || 'N/A';
+                    const transaction = filing.transaction_details || 'N/A';
+                    
+                    tableHTML += `
+                        <tr>
+                            <td class="date-cell">${date}</td>
+                            <td><span class="ticker-badge">${filing.ticker}</span></td>
+                            <td>${filing.company}</td>
+                            <td><span class="filing-type-badge">${filingType}</span></td>
+                            <td class="insider-cell">${insider}</td>
+                            <td class="transaction-cell">${transaction}</td>
+                            <td>${link}</td>
+                        </tr>
+                    `;
+                });
+                
+                tableHTML += '</tbody></table>';
+                container.innerHTML = tableHTML;
+                
+            } catch (error) {
+                console.error('Error loading SEC filings:', error);
+                container.innerHTML = '<div class="loading">Error loading SEC filings</div>';
+            }
+        }
+        
+        // Load FDA events
+        async function loadFdaEvents() {
+            const days = document.getElementById('fdaTimeRange').value;
+            const container = document.getElementById('fdaTable');
+            
+            container.innerHTML = '<div class="loading">Loading FDA events...</div>';
+            
+            try {
+                const response = await fetch(`/api/fda-events?days=${days}`);
+                const events = await response.json();
+                
+                if (events.length === 0) {
+                    container.innerHTML = '<div class="loading">No FDA events found for this period</div>';
+                    return;
+                }
+                
+                let tableHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Ticker</th>
+                                <th>Company</th>
+                                <th>Source</th>
+                                <th>Event Description</th>
+                                <th>Link</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                events.forEach(event => {
+                    const date = event.timestamp ? event.timestamp.split('T')[0] : 'N/A';
+                    const link = event.link ? `<a href="${event.link}" target="_blank" class="event-link">View Details</a>` : 'N/A';
+                    const sourceClass = event.source.toLowerCase().replace('-', '-');
+                    
+                    tableHTML += `
+                        <tr>
+                            <td class="date-cell">${date}</td>
+                            <td><span class="ticker-badge">${event.ticker}</span></td>
+                            <td>${event.company}</td>
+                            <td><span class="source-badge ${sourceClass}">${event.source}</span></td>
+                            <td>${event.event_text}</td>
+                            <td>${link}</td>
+                        </tr>
+                    `;
+                });
+                
+                tableHTML += '</tbody></table>';
+                container.innerHTML = tableHTML;
+                
+            } catch (error) {
+                console.error('Error loading FDA events:', error);
+                container.innerHTML = '<div class="loading">Error loading FDA events</div>';
+            }
+        }
+        
+        // Load NHTSA recalls
+        async function loadNhtsaRecalls() {
+            const days = document.getElementById('nhtsaTimeRange').value;
+            const container = document.getElementById('nhtsaTable');
+            
+            container.innerHTML = '<div class="loading">Loading vehicle recalls...</div>';
+            
+            try {
+                const response = await fetch(`/api/nhtsa-recalls?days=${days}`);
+                const recalls = await response.json();
+                
+                if (recalls.length === 0) {
+                    container.innerHTML = '<div class="loading">No vehicle recalls found for this period</div>';
+                    return;
+                }
+                
+                let tableHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Ticker</th>
+                                <th>Company</th>
+                                <th>Recall Description</th>
+                                <th>Link</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                recalls.forEach(recall => {
+                    const date = recall.timestamp ? recall.timestamp.split('T')[0] : 'N/A';
+                    const link = recall.link ? `<a href="${recall.link}" target="_blank" class="event-link">View Recall</a>` : 'N/A';
+                    
+                    tableHTML += `
+                        <tr>
+                            <td class="date-cell">${date}</td>
+                            <td><span class="ticker-badge">${recall.ticker}</span></td>
+                            <td>${recall.company}</td>
+                            <td>${recall.event_text}</td>
+                            <td>${link}</td>
+                        </tr>
+                    `;
+                });
+                
+                tableHTML += '</tbody></table>';
+                container.innerHTML = tableHTML;
+                
+            } catch (error) {
+                console.error('Error loading NHTSA recalls:', error);
+                container.innerHTML = '<div class="loading">Error loading vehicle recalls</div>';
+            }
+        }
+    </script>
+</body>
+</html>
