@@ -37,7 +37,10 @@ class EventIngester:
                 event_text TEXT NOT NULL,
                 link TEXT,
                 insider_name TEXT,
-                transaction_details TEXT,
+                transaction_type TEXT,
+                shares INTEGER,
+                price REAL,
+                total_value REAL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE(timestamp, source, ticker, event_text)
             )
@@ -45,15 +48,15 @@ class EventIngester:
         conn.commit()
         conn.close()
     
-    def add_event(self, timestamp, source, ticker, company, event_text, link=None, insider_name=None, transaction_details=None):
+    def add_event(self, timestamp, source, ticker, company, event_text, link=None, insider_name=None, transaction_type=None, shares=None, price=None, total_value=None):
         """Add event to database with deduplication"""
         conn = sqlite3.connect(self.db_path)
         try:
             conn.execute('''
                 INSERT OR IGNORE INTO events 
-                (timestamp, source, ticker, company, event_text, link, insider_name, transaction_details)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (timestamp, source, ticker.upper(), company, event_text, link, insider_name, transaction_details))
+                (timestamp, source, ticker, company, event_text, link, insider_name, transaction_type, shares, price, total_value)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (timestamp, source, ticker.upper(), company, event_text, link, insider_name, transaction_type, shares, price, total_value))
             conn.commit()
         except Exception as e:
             print(f"Error adding event: {e}")
@@ -274,29 +277,38 @@ class EventIngester:
                 action_match = re.search(r'<transactionAcquiredDisposedCode>([^<]+)</transactionAcquiredDisposedCode>', content)
             
             if shares_match:
-                shares = shares_match.group(1).strip()
-                price = price_match.group(1).strip() if price_match else "N/A"
-                action = action_match.group(1).strip() if action_match else "N/A"
+                shares_str = shares_match.group(1).strip()
+                price_str = price_match.group(1).strip() if price_match else None
+                action = action_match.group(1).strip() if action_match else None
                 
-                # A = Acquired, D = Disposed
-                action_text = "Bought" if action == "A" else "Sold" if action == "D" else action
+                # Parse transaction type
+                transaction_type = None
+                if action == "A":
+                    transaction_type = "Buy"
+                elif action == "D":
+                    transaction_type = "Sell"
                 
+                # Parse shares and price
                 try:
-                    shares_num = float(shares.replace(',', ''))
-                    if price != "N/A" and price.replace('.', '').replace(',', '').isdigit():
-                        price_num = float(price.replace(',', ''))
-                        value = shares_num * price_num
-                        insider_info['transaction'] = f"{action_text} {shares_num:,.0f} shares at ${price_num:.2f} (${value:,.0f})"
-                    else:
-                        insider_info['transaction'] = f"{action_text} {shares_num:,.0f} shares"
-                except ValueError:
-                    insider_info['transaction'] = f"{action_text} {shares} shares"
-            
-            # If no transaction found, look for derivative transactions
-            if 'transaction' not in insider_info:
-                derivative_shares = re.search(r'<derivativeTransaction>.*?<transactionShares>.*?<value>([^<]+)</value>', content, re.DOTALL)
-                if derivative_shares:
-                    insider_info['transaction'] = f"Derivative transaction: {derivative_shares.group(1)} shares"
+                    shares_num = int(float(shares_str.replace(',', '')))
+                    price_num = float(price_str.replace(',', '')) if price_str else None
+                    total_value = shares_num * price_num if price_num else None
+                    
+                    insider_info.update({
+                        'transaction_type': transaction_type,
+                        'shares': shares_num,
+                        'price': price_num,
+                        'total_value': total_value
+                    })
+                    
+                except (ValueError, TypeError):
+                    # If parsing fails, store as text for debugging
+                    insider_info.update({
+                        'transaction_type': transaction_type,
+                        'shares': None,
+                        'price': None,
+                        'total_value': None
+                    })
             
             return insider_info
             
@@ -328,62 +340,52 @@ class EventIngester:
             
             filings = []
             for form, filing_date, accession, primary_doc in zip(forms, dates, accessions, primary_docs):
-                if form in ["8-K", "4"]:
+                # Only process Form 4 filings
+                if form == "4":
                     normalized_date = self.normalize_date(filing_date)
                     if normalized_date and self.is_within_range(normalized_date, days_back):
                         # Construct the filing URL
                         accession_no_dash = accession.replace('-', '')
                         filing_url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession_no_dash}/{primary_doc}"
                         
-                        # For Form 4, try to get the XML version instead of HTML
-                        if form == "4":
-                            # The primary_doc often points to an HTML version in a subfolder
-                            # Try to construct the direct XML URL
-                            if '/' in primary_doc:
-                                # Extract the filename from the path
-                                filename = primary_doc.split('/')[-1]
-                                if filename.endswith('.xml'):
-                                    # Try direct XML access
-                                    xml_url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession_no_dash}/{filename}"
-                                    try:
-                                        test_response = requests.head(xml_url, headers=headers, timeout=5)
-                                        if test_response.status_code == 200:
-                                            filing_url = xml_url
-                                    except:
-                                        pass
+                        # Try to get the XML version instead of HTML
+                        if '/' in primary_doc:
+                            # Extract the filename from the path
+                            filename = primary_doc.split('/')[-1]
+                            if filename.endswith('.xml'):
+                                # Try direct XML access
+                                xml_url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession_no_dash}/{filename}"
+                                try:
+                                    test_response = requests.head(xml_url, headers=headers, timeout=5)
+                                    if test_response.status_code == 200:
+                                        filing_url = xml_url
+                                except:
+                                    pass
                         
-                        event_text = f"SEC {form} Filing"
+                        # Parse Form 4 content
+                        print(f"Parsing Form 4: {filing_url}")
+                        insider_info = self.parse_form4_content(filing_url, headers)
                         
-                        insider_name = None
-                        transaction_details = None
-                        
-                        # For Form 4 filings, try to extract insider trading details
-                        if form == "4":
-                            print(f"Parsing Form 4: {filing_url}")
-                            insider_info = self.parse_form4_content(filing_url, headers)
-                            
-                            if insider_info.get('insider_name'):
-                                insider_name = insider_info['insider_name']
-                                
-                            if insider_info.get('transaction'):
-                                transaction_details = insider_info['transaction']
-                                event_text = f"SEC Form 4: {insider_name} - {transaction_details}"
-                            elif insider_name:
-                                event_text = f"SEC Form 4: {insider_name} - Insider Trading"
-                            else:
-                                event_text = "SEC Form 4: Insider Trading"
+                        # Create event text
+                        insider_name = insider_info.get('insider_name')
+                        if insider_name:
+                            event_text = f"Form 4: {insider_name}"
+                        else:
+                            event_text = "Form 4: Insider Trading"
                         
                         filings.append({
                             'timestamp': normalized_date,
                             'event_text': event_text,
                             'link': filing_url,
                             'insider_name': insider_name,
-                            'transaction_details': transaction_details
+                            'transaction_type': insider_info.get('transaction_type'),
+                            'shares': insider_info.get('shares'),
+                            'price': insider_info.get('price'),
+                            'total_value': insider_info.get('total_value')
                         })
                         
                         # Add a small delay to be respectful to SEC servers
-                        if form == "4":
-                            time.sleep(0.5)
+                        time.sleep(0.5)
             
             return filings
         except Exception as e:
@@ -445,7 +447,8 @@ class EventIngester:
             for event in sec_events:
                 self.add_event(event['timestamp'], 'SEC', ticker, company_name,
                              event['event_text'], event['link'], 
-                             event.get('insider_name'), event.get('transaction_details'))
+                             event.get('insider_name'), event.get('transaction_type'),
+                             event.get('shares'), event.get('price'), event.get('total_value'))
             
             print(f"Completed {ticker}: {len(nhtsa_events + fda_drug_events + fda_device_events + sec_events)} events")
             time.sleep(1)  # Be respectful to APIs
@@ -487,7 +490,8 @@ class EventIngester:
             for event in sec_events:
                 self.add_event(event['timestamp'], 'SEC', ticker, company_name,
                              event['event_text'], event['link'],
-                             event.get('insider_name'), event.get('transaction_details'))
+                             event.get('insider_name'), event.get('transaction_type'),
+                             event.get('shares'), event.get('price'), event.get('total_value'))
             
             if total_events > 0:
                 print(f"Added {total_events} new events for {ticker}")

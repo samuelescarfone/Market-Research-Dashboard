@@ -280,6 +280,31 @@
             white-space: normal;
             overflow: visible;
         }
+        
+        .transaction-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .transaction-buy {
+            background: #34c759;
+            color: white;
+        }
+        
+        .transaction-sell {
+            background: #ff3b30;
+            color: white;
+        }
+        
+        .number-cell {
+            text-align: right;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 <body>
@@ -290,7 +315,7 @@
     
     <div class="tabs">
         <button class="tab-button active" onclick="showTab('chart')">Stock Chart</button>
-        <button class="tab-button" onclick="showTab('sec')">SEC Filings</button>
+        <button class="tab-button" onclick="showTab('sec')">Form 4 Filings</button>
         <button class="tab-button" onclick="showTab('fda')">FDA Events</button>
         <button class="tab-button" onclick="showTab('nhtsa')">Vehicle Recalls</button>
     </div>
@@ -333,13 +358,13 @@
                 <option value="180">180 Days</option>
                 <option value="365">1 Year</option>
             </select>
-            <button onclick="loadSecFilings()">Load SEC Filings</button>
+            <button onclick="loadSecFilings()">Load Form 4 Filings</button>
         </div>
         
         <div class="data-table-container">
-            <h3>SEC Filings (8-K & Form 4)</h3>
+            <h3>Form 4 Insider Trading Filings</h3>
             <div id="secTable">
-                <div class="loading">Click "Load SEC Filings" to view data</div>
+                <div class="loading">Click "Load Form 4 Filings" to view data</div>
             </div>
         </div>
     </div>
@@ -594,9 +619,11 @@
                                 <th>Date</th>
                                 <th>Ticker</th>
                                 <th>Company</th>
-                                <th>Filing Type</th>
                                 <th>Insider</th>
                                 <th>Transaction</th>
+                                <th>Shares</th>
+                                <th>Price</th>
+                                <th>Total Value</th>
                                 <th>Link</th>
                             </tr>
                         </thead>
@@ -607,25 +634,26 @@
                     const date = filing.timestamp ? filing.timestamp.split('T')[0] : 'N/A';
                     const link = filing.link ? `<a href="${filing.link}" target="_blank" class="event-link">View Filing</a>` : 'N/A';
                     
-                    // Extract filing type from event_text
-                    let filingType = filing.event_text;
-                    if (filing.event_text.includes('Form 4:')) {
-                        filingType = 'Form 4';
-                    } else if (filing.event_text.includes('8-K')) {
-                        filingType = '8-K';
-                    }
-                    
                     const insider = filing.insider_name || 'N/A';
-                    const transaction = filing.transaction_details || 'N/A';
+                    const transactionType = filing.transaction_type || 'N/A';
+                    const shares = filing.shares ? filing.shares.toLocaleString() : 'N/A';
+                    const price = filing.price ? `$${filing.price.toFixed(2)}` : 'N/A';
+                    const totalValue = filing.total_value ? `$${filing.total_value.toLocaleString()}` : 'N/A';
+                    
+                    // Color code transaction type
+                    const transactionClass = transactionType === 'Buy' ? 'transaction-buy' : 
+                                           transactionType === 'Sell' ? 'transaction-sell' : '';
                     
                     tableHTML += `
                         <tr>
                             <td class="date-cell">${date}</td>
                             <td><span class="ticker-badge">${filing.ticker}</span></td>
                             <td>${filing.company}</td>
-                            <td><span class="filing-type-badge">${filingType}</span></td>
                             <td class="insider-cell">${insider}</td>
-                            <td class="transaction-cell">${transaction}</td>
+                            <td><span class="transaction-badge ${transactionClass}">${transactionType}</span></td>
+                            <td class="number-cell">${shares}</td>
+                            <td class="number-cell">${price}</td>
+                            <td class="number-cell">${totalValue}</td>
                             <td>${link}</td>
                         </tr>
                     `;

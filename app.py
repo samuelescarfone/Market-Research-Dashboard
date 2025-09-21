@@ -142,13 +142,14 @@ def get_chart_data(ticker):
 
 @app.route('/api/sec-filings')
 def get_sec_filings():
-    """Get all SEC filings with insider trading details"""
+    """Get all SEC Form 4 filings with insider trading details"""
     days = request.args.get('days', 90, type=int)
     since_date = (datetime.now() - timedelta(days=days)).isoformat()
     
     conn = get_db_connection()
     filings = conn.execute('''
-        SELECT timestamp, ticker, company, event_text, link, insider_name, transaction_details
+        SELECT timestamp, ticker, company, event_text, link, insider_name, 
+               transaction_type, shares, price, total_value
         FROM events 
         WHERE source = 'SEC' AND timestamp >= ?
         ORDER BY timestamp DESC
