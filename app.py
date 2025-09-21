@@ -192,6 +192,60 @@ def get_nhtsa_recalls():
     
     return jsonify([dict(row) for row in recalls])
 
+@app.route('/api/sentiment/<ticker>')
+def get_sentiment_data(ticker):
+    """Get daily sentiment data for a ticker"""
+    days = request.args.get('days', 90, type=int)
+    since_date = (datetime.now() - timedelta(days=days)).date().isoformat()
+    
+    conn = get_db_connection()
+    sentiment = conn.execute('''
+        SELECT date, avg_vader_score, avg_finbert_score, post_count
+        FROM daily_sentiment 
+        WHERE ticker = ? AND date >= ?
+        ORDER BY date ASC
+    ''', (ticker.upper(), since_date)).fetchall()
+    conn.close()
+    
+    return jsonify([dict(row) for row in sentiment])
+
+@app.route('/api/sentiment-chart/<ticker>')
+def get_sentiment_chart_data(ticker):
+    """Get combined stock and sentiment data for charting"""
+    days = request.args.get('days', 90, type=int)
+    
+    # Get stock data
+    try:
+        stock = yf.Ticker(ticker)
+        hist = stock.history(period=f"{days}d")
+        stock_data = []
+        for date, row in hist.iterrows():
+            stock_data.append({
+                'date': date.strftime('%Y-%m-%d'),
+                'close': round(row['Close'], 2),
+                'volume': int(row['Volume'])
+            })
+    except Exception as e:
+        stock_data = []
+    
+    # Get sentiment data
+    since_date = (datetime.now() - timedelta(days=days)).date().isoformat()
+    conn = get_db_connection()
+    sentiment = conn.execute('''
+        SELECT date, avg_vader_score, avg_finbert_score, post_count
+        FROM daily_sentiment 
+        WHERE ticker = ? AND date >= ?
+        ORDER BY date ASC
+    ''', (ticker.upper(), since_date)).fetchall()
+    conn.close()
+    
+    sentiment_data = [dict(row) for row in sentiment]
+    
+    return jsonify({
+        'stock': stock_data,
+        'sentiment': sentiment_data
+    })
+
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True, host='0.0.0.0', port=3000)
+    app.run(debug=True, host='127.0.0.1', port=8080)

@@ -14,149 +14,126 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f7;
-            color: #1d1d1f;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
         }
         
-        .header {
-            background: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-        }
-        
-        .header h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-        
-        .controls {
+        .app-container {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            padding: 0 2rem;
+            min-height: 100vh;
         }
         
-        select, button {
-            padding: 0.5rem 1rem;
-            border: 1px solid #d2d2d7;
-            border-radius: 8px;
-            background: white;
-            font-size: 0.9rem;
-        }
-        
-        button {
-            background: #007aff;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        
-        button:hover {
-            background: #0056b3;
-        }
-        
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 2rem;
-            padding: 0 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .chart-container {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .events-panel {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            max-height: 600px;
+        .sidebar {
+            width: 280px;
+            background: #1a1a1a;
+            border-right: 1px solid #2a2a2a;
+            padding: 1.5rem 0;
+            position: fixed;
+            height: 100vh;
             overflow-y: auto;
         }
         
-        .events-panel h3 {
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
-            color: #1d1d1f;
+        .sidebar-header {
+            padding: 0 1.5rem 2rem 1.5rem;
+            border-bottom: 1px solid #2a2a2a;
+            margin-bottom: 1.5rem;
         }
         
-        .event-item {
-            padding: 0.75rem;
-            margin-bottom: 0.5rem;
-            border-radius: 8px;
-            border-left: 4px solid #007aff;
-            background: #f8f9fa;
-        }
-        
-        .event-source {
-            font-size: 0.75rem;
+        .sidebar-header h1 {
+            font-size: 1.25rem;
             font-weight: 600;
-            color: #007aff;
-            text-transform: uppercase;
-            margin-bottom: 0.25rem;
+            color: #ffffff;
         }
         
-        .event-date {
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar-section-title {
+            padding: 0 1.5rem;
             font-size: 0.75rem;
-            color: #86868b;
-            margin-bottom: 0.25rem;
-        }
-        
-        .event-text {
-            font-size: 0.85rem;
-            line-height: 1.4;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: #86868b;
-        }
-        
-        .source-nhtsa { border-left-color: #ff3b30; }
-        .source-fda-drug { border-left-color: #ff9500; }
-        .source-sec { border-left-color: #34c759; }
-        
-        .source-nhtsa .event-source { color: #ff3b30; }
-        .source-fda-drug .event-source { color: #ff9500; }
-        .source-sec .event-source { color: #34c759; }
-        
-        .tabs {
-            display: flex;
-            background: white;
-            margin: 0 2rem 2rem 2rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        
-        .tab-button {
-            flex: 1;
-            padding: 1rem 2rem;
-            border: none;
-            background: white;
-            color: #86868b;
-            font-size: 0.9rem;
             font-weight: 500;
+            color: #8a8a8a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #b3b3b3;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 400;
             cursor: pointer;
             transition: all 0.2s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
         }
         
-        .tab-button:hover {
-            background: #f8f9fa;
-            color: #1d1d1f;
+        .sidebar-item:hover {
+            background: #2a2a2a;
+            color: #ffffff;
         }
         
-        .tab-button.active {
-            background: #007aff;
-            color: white;
+        .sidebar-item.active {
+            background: #4c6ef5;
+            color: #ffffff;
+        }
+        
+        .sidebar-item-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
+            opacity: 0.7;
+        }
+        
+        .ticker-selector {
+            padding: 0 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .ticker-selector select {
+            width: 100%;
+            padding: 0.75rem;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.9rem;
+        }
+        
+        .ticker-selector select:focus {
+            outline: none;
+            border-color: #4c6ef5;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            background: #0a0a0a;
+        }
+        
+        .content-header {
+            margin-bottom: 2rem;
+        }
+        
+        .content-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+        
+        .content-subtitle {
+            color: #8a8a8a;
+            font-size: 0.9rem;
         }
         
         .tab-content {
@@ -167,15 +144,93 @@
             display: block;
         }
         
-        .data-table-container {
-            background: white;
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            max-width: 1400px;
+        }
+        
+        .charts-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .chart-container {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
             border-radius: 12px;
             padding: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin: 0 2rem;
+        }
+        
+        .sentiment-chart {
+            height: 400px; /* Make sentiment chart twice as tall */
+        }
+        
+        .events-panel {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .events-panel h3 {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: #ffffff;
+        }
+        
+        .event-item {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #4c6ef5;
+            background: #2a2a2a;
+        }
+        
+        .event-source {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4c6ef5;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+        
+        .event-date {
+            font-size: 0.75rem;
+            color: #8a8a8a;
+            margin-bottom: 0.25rem;
+        }
+        
+        .event-text {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: #ffffff;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #8a8a8a;
+        }
+        
+        .source-nhtsa { border-left-color: #ff3b30; }
+        .source-fda-drug { border-left-color: #ff9500; }
+        .source-sec { border-left-color: #34c759; }
+        
+        .source-nhtsa .event-source { color: #ff3b30; }
+        .source-fda-drug .event-source { color: #ff9500; }
+        .source-sec .event-source { color: #34c759; }
+        
+        .data-table-container {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 1.5rem;
             max-width: 1400px;
-            margin-left: auto;
-            margin-right: auto;
         }
         
         .data-table {
@@ -188,13 +243,13 @@
         .data-table td {
             padding: 0.75rem;
             text-align: left;
-            border-bottom: 1px solid #e5e5e7;
+            border-bottom: 1px solid #2a2a2a;
         }
         
         .data-table th {
-            background: #f8f9fa;
+            background: #2a2a2a;
             font-weight: 600;
-            color: #1d1d1f;
+            color: #ffffff;
             font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -203,15 +258,16 @@
         .data-table td {
             font-size: 0.9rem;
             vertical-align: top;
+            color: #ffffff;
         }
         
         .data-table tr:hover {
-            background: #f8f9fa;
+            background: #2a2a2a;
         }
         
         .ticker-badge {
             display: inline-block;
-            background: #007aff;
+            background: #4c6ef5;
             color: white;
             padding: 0.25rem 0.5rem;
             border-radius: 4px;
@@ -234,7 +290,7 @@
         .source-badge.nhtsa { background: #ff3b30; color: white; }
         
         .event-link {
-            color: #007aff;
+            color: #4c6ef5;
             text-decoration: none;
             font-size: 0.8rem;
         }
@@ -245,7 +301,7 @@
         
         .date-cell {
             white-space: nowrap;
-            color: #86868b;
+            color: #8a8a8a;
             font-size: 0.85rem;
         }
         
@@ -265,20 +321,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-        }
-        
-        .transaction-cell {
-            font-size: 0.85rem;
-            font-weight: 500;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        .transaction-cell:hover {
-            white-space: normal;
-            overflow: visible;
         }
         
         .transaction-badge {
@@ -305,112 +347,183 @@
             font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
             font-size: 0.85rem;
         }
+        
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .controls select, .controls button {
+            padding: 0.75rem 1rem;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.9rem;
+        }
+        
+        .controls button {
+            background: #4c6ef5;
+            cursor: pointer;
+        }
+        
+        .controls button:hover {
+            background: #3b5bdb;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Company Catalyst Dashboard</h1>
-        <p>Regulatory events overlaid on stock price charts</p>
-    </div>
-    
-    <div class="tabs">
-        <button class="tab-button active" onclick="showTab('chart')">Stock Chart</button>
-        <button class="tab-button" onclick="showTab('sec')">Form 4 Filings</button>
-        <button class="tab-button" onclick="showTab('fda')">FDA Events</button>
-        <button class="tab-button" onclick="showTab('nhtsa')">Vehicle Recalls</button>
-    </div>
-    
-    <!-- Chart Tab -->
-    <div id="chartTab" class="tab-content active">
-        <div class="controls">
-            <select id="tickerSelect">
-                <option value="">Select Company...</option>
-            </select>
-            <select id="timeRange">
-                <option value="30">30 Days</option>
-                <option value="90" selected>90 Days</option>
-                <option value="180">180 Days</option>
-                <option value="365">1 Year</option>
-            </select>
-            <button onclick="loadData()">Load Data</button>
-        </div>
-        
-        <div class="dashboard">
-            <div class="chart-container">
-                <canvas id="stockChart" width="800" height="400"></canvas>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>Catalyst Dashboard</h1>
             </div>
             
-            <div class="events-panel">
-                <h3>Recent Events</h3>
-                <div id="eventsList">
-                    <div class="loading">Select a company to view events</div>
+            <div class="ticker-selector">
+                <select id="globalTickerSelect">
+                    <option value="">Select Company...</option>
+                </select>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Content</div>
+                <button class="sidebar-item active" onclick="showTab('chart')">
+                    <span class="sidebar-item-icon">📈</span>
+                    Stock Chart
+                </button>
+                <button class="sidebar-item" onclick="showTab('sec')">
+                    <span class="sidebar-item-icon">📋</span>
+                    Form 4 Filings
+                </button>
+                <button class="sidebar-item" onclick="showTab('fda')">
+                    <span class="sidebar-item-icon">💊</span>
+                    FDA Events
+                </button>
+                <button class="sidebar-item" onclick="showTab('nhtsa')">
+                    <span class="sidebar-item-icon">🚗</span>
+                    Vehicle Recalls
+                </button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Chart Tab -->
+            <div id="chartTab" class="tab-content active">
+                <div class="content-header">
+                    <h2 class="content-title">Stock Analysis</h2>
+                    <p class="content-subtitle">Stock price movements with regulatory events and sentiment analysis</p>
+                </div>
+                
+                <div class="controls">
+                    <select id="timeRange">
+                        <option value="30">30 Days</option>
+                        <option value="90" selected>90 Days</option>
+                        <option value="180">180 Days</option>
+                        <option value="365">1 Year</option>
+                    </select>
+                    <button onclick="loadData()">Load Data</button>
+                </div>
+                
+                <div class="dashboard">
+                    <div class="charts-section">
+                        <div class="chart-container">
+                            <canvas id="stockChart" width="800" height="400"></canvas>
+                        </div>
+                        <div class="chart-container sentiment-chart">
+                            <canvas id="sentimentChart" width="800" height="400"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="events-panel">
+                        <h3>Recent Events</h3>
+                        <div id="eventsList">
+                            <div class="loading">Select a company to view events</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- SEC Filings Tab -->
-    <div id="secTab" class="tab-content">
-        <div class="controls">
-            <select id="secTimeRange">
-                <option value="30">30 Days</option>
-                <option value="90" selected>90 Days</option>
-                <option value="180">180 Days</option>
-                <option value="365">1 Year</option>
-            </select>
-            <button onclick="loadSecFilings()">Load Form 4 Filings</button>
-        </div>
-        
-        <div class="data-table-container">
-            <h3>Form 4 Insider Trading Filings</h3>
-            <div id="secTable">
-                <div class="loading">Click "Load Form 4 Filings" to view data</div>
+            
+            <!-- SEC Filings Tab -->
+            <div id="secTab" class="tab-content">
+                <div class="content-header">
+                    <h2 class="content-title">Form 4 Insider Trading</h2>
+                    <p class="content-subtitle">SEC Form 4 filings with detailed transaction information</p>
+                </div>
+                
+                <div class="controls">
+                    <select id="secTimeRange">
+                        <option value="30">30 Days</option>
+                        <option value="90" selected>90 Days</option>
+                        <option value="180">180 Days</option>
+                        <option value="365">1 Year</option>
+                    </select>
+                    <button onclick="loadSecFilings()">Load Form 4 Filings</button>
+                </div>
+                
+                <div class="data-table-container">
+                    <h3>Form 4 Insider Trading Filings</h3>
+                    <div id="secTable">
+                        <div class="loading">Click "Load Form 4 Filings" to view data</div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- FDA Events Tab -->
-    <div id="fdaTab" class="tab-content">
-        <div class="controls">
-            <select id="fdaTimeRange">
-                <option value="30">30 Days</option>
-                <option value="90" selected>90 Days</option>
-                <option value="180">180 Days</option>
-                <option value="365">1 Year</option>
-            </select>
-            <button onclick="loadFdaEvents()">Load FDA Events</button>
-        </div>
-        
-        <div class="data-table-container">
-            <h3>FDA Adverse Events (Drug & Device)</h3>
-            <div id="fdaTable">
-                <div class="loading">Click "Load FDA Events" to view data</div>
+            
+            <!-- FDA Events Tab -->
+            <div id="fdaTab" class="tab-content">
+                <div class="content-header">
+                    <h2 class="content-title">FDA Adverse Events</h2>
+                    <p class="content-subtitle">Drug and device adverse events reported to the FDA</p>
+                </div>
+                
+                <div class="controls">
+                    <select id="fdaTimeRange">
+                        <option value="30">30 Days</option>
+                        <option value="90" selected>90 Days</option>
+                        <option value="180">180 Days</option>
+                        <option value="365">1 Year</option>
+                    </select>
+                    <button onclick="loadFdaEvents()">Load FDA Events</button>
+                </div>
+                
+                <div class="data-table-container">
+                    <h3>FDA Adverse Events (Drug & Device)</h3>
+                    <div id="fdaTable">
+                        <div class="loading">Click "Load FDA Events" to view data</div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- NHTSA Recalls Tab -->
-    <div id="nhtsaTab" class="tab-content">
-        <div class="controls">
-            <select id="nhtsaTimeRange">
-                <option value="30">30 Days</option>
-                <option value="90" selected>90 Days</option>
-                <option value="180">180 Days</option>
-                <option value="365">1 Year</option>
-            </select>
-            <button onclick="loadNhtsaRecalls()">Load Vehicle Recalls</button>
-        </div>
-        
-        <div class="data-table-container">
-            <h3>NHTSA Vehicle Recalls</h3>
-            <div id="nhtsaTable">
-                <div class="loading">Click "Load Vehicle Recalls" to view data</div>
+            
+            <!-- NHTSA Recalls Tab -->
+            <div id="nhtsaTab" class="tab-content">
+                <div class="content-header">
+                    <h2 class="content-title">Vehicle Safety Recalls</h2>
+                    <p class="content-subtitle">NHTSA vehicle safety recalls and defect investigations</p>
+                </div>
+                
+                <div class="controls">
+                    <select id="nhtsaTimeRange">
+                        <option value="30">30 Days</option>
+                        <option value="90" selected>90 Days</option>
+                        <option value="180">180 Days</option>
+                        <option value="365">1 Year</option>
+                    </select>
+                    <button onclick="loadNhtsaRecalls()">Load Vehicle Recalls</button>
+                </div>
+                
+                <div class="data-table-container">
+                    <h3>NHTSA Vehicle Recalls</h3>
+                    <div id="nhtsaTable">
+                        <div class="loading">Click "Load Vehicle Recalls" to view data</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         let stockChart = null;
+        let sentimentChart = null;
         
         // Load companies on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -422,7 +535,7 @@
                 const response = await fetch('/api/companies');
                 const companies = await response.json();
                 
-                const select = document.getElementById('tickerSelect');
+                const select = document.getElementById('globalTickerSelect');
                 select.innerHTML = '<option value="">Select Company...</option>';
                 
                 companies.forEach(company => {
@@ -436,8 +549,21 @@
             }
         }
         
+        // Global ticker selection that applies to all tabs
+        document.getElementById('globalTickerSelect').addEventListener('change', function() {
+            const selectedTicker = this.value;
+            // Update all other selectors if they exist
+            const selectors = ['tickerSelect'];
+            selectors.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.value = selectedTicker;
+                }
+            });
+        });
+        
         async function loadData() {
-            const ticker = document.getElementById('tickerSelect').value;
+            const ticker = document.getElementById('globalTickerSelect').value;
             const days = document.getElementById('timeRange').value;
             
             if (!ticker) {
@@ -452,7 +578,12 @@
                 const chartResponse = await fetch(`/api/chart-data/${ticker}?days=${days}`);
                 const chartData = await chartResponse.json();
                 
+                // Load sentiment data
+                const sentimentResponse = await fetch(`/api/sentiment-chart/${ticker}?days=${days}`);
+                const sentimentData = await sentimentResponse.json();
+                
                 updateChart(chartData.stock, chartData.events, ticker);
+                updateSentimentChart(sentimentData.sentiment, ticker);
                 updateEventsList(chartData.events);
                 
             } catch (error) {
@@ -490,8 +621,8 @@
                     datasets: [{
                         label: `${ticker} Stock Price`,
                         data: prices,
-                        borderColor: '#007aff',
-                        backgroundColor: 'rgba(0, 122, 255, 0.1)',
+                        borderColor: '#4c6ef5',
+                        backgroundColor: 'rgba(76, 110, 245, 0.1)',
                         borderWidth: 2,
                         fill: true,
                         tension: 0.1
@@ -500,36 +631,44 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: `${ticker} Stock Price with Catalyst Events`,
+                            color: '#ffffff'
+                        }
+                    },
                     scales: {
                         y: {
                             beginAtZero: false,
                             title: {
                                 display: true,
-                                text: 'Price ($)'
+                                text: 'Price ($)',
+                                color: '#ffffff'
+                            },
+                            ticks: {
+                                color: '#8a8a8a'
+                            },
+                            grid: {
+                                color: '#2a2a2a'
                             }
                         },
                         x: {
                             title: {
                                 display: true,
-                                text: 'Date'
-                            }
-                        }
-                    },
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: `${ticker} Stock Price with Catalyst Events`
-                        },
-                        tooltip: {
-                            callbacks: {
-                                afterBody: function(context) {
-                                    const date = context[0].label;
-                                    const events = eventAnnotations[date];
-                                    if (events && events.length > 0) {
-                                        return events.map(e => `${e.source}: ${e.text}`);
-                                    }
-                                    return [];
-                                }
+                                text: 'Date',
+                                color: '#ffffff'
+                            },
+                            ticks: {
+                                color: '#8a8a8a'
+                            },
+                            grid: {
+                                color: '#2a2a2a'
                             }
                         }
                     },
@@ -537,15 +676,144 @@
                         point: {
                             backgroundColor: function(context) {
                                 const date = labels[context.dataIndex];
-                                return eventAnnotations[date] ? '#ff3b30' : '#007aff';
+                                return eventAnnotations[date] ? '#ff3b30' : '#4c6ef5';
                             },
                             borderColor: function(context) {
                                 const date = labels[context.dataIndex];
-                                return eventAnnotations[date] ? '#ff3b30' : '#007aff';
+                                return eventAnnotations[date] ? '#ff3b30' : '#4c6ef5';
                             },
                             radius: function(context) {
                                 const date = labels[context.dataIndex];
                                 return eventAnnotations[date] ? 6 : 3;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateSentimentChart(sentimentData, ticker) {
+            const ctx = document.getElementById('sentimentChart').getContext('2d');
+            
+            if (sentimentChart) {
+                sentimentChart.destroy();
+            }
+            
+            if (!sentimentData || sentimentData.length === 0) {
+                // Show empty chart message
+                ctx.fillStyle = '#8a8a8a';
+                ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('No sentiment data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
+            // Prepare sentiment data
+            const labels = sentimentData.map(d => d.date);
+            const vaderScores = sentimentData.map(d => d.avg_vader_score || 0);
+            const finbertScores = sentimentData.map(d => d.avg_finbert_score || 0);
+            const postCounts = sentimentData.map(d => d.post_count || 0);
+            
+            sentimentChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'VADER Sentiment',
+                            data: vaderScores,
+                            backgroundColor: vaderScores.map(score => 
+                                score > 0.1 ? 'rgba(52, 199, 89, 0.7)' :  // Green for positive
+                                score < -0.1 ? 'rgba(255, 59, 48, 0.7)' : // Red for negative
+                                'rgba(142, 142, 147, 0.7)'                // Gray for neutral
+                            ),
+                            borderColor: vaderScores.map(score => 
+                                score > 0.1 ? 'rgba(52, 199, 89, 1)' :
+                                score < -0.1 ? 'rgba(255, 59, 48, 1)' :
+                                'rgba(142, 142, 147, 1)'
+                            ),
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Post Count',
+                            data: postCounts,
+                            type: 'line',
+                            borderColor: 'rgba(76, 110, 245, 0.8)',
+                            backgroundColor: 'rgba(76, 110, 245, 0.1)',
+                            borderWidth: 2,
+                            fill: false,
+                            yAxisID: 'y1',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: `${ticker} Daily Sentiment Analysis`,
+                            color: '#ffffff'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date',
+                                color: '#ffffff'
+                            },
+                            ticks: {
+                                color: '#8a8a8a'
+                            },
+                            grid: {
+                                color: '#2a2a2a'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Sentiment Score',
+                                color: '#ffffff'
+                            },
+                            min: -1,
+                            max: 1,
+                            ticks: {
+                                color: '#8a8a8a'
+                            },
+                            grid: {
+                                color: '#2a2a2a'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Post Count',
+                                color: '#ffffff'
+                            },
+                            ticks: {
+                                color: '#8a8a8a'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                                color: '#2a2a2a'
                             }
                         }
                     }
@@ -584,8 +852,8 @@
                 tab.classList.remove('active');
             });
             
-            // Remove active class from all tab buttons
-            document.querySelectorAll('.tab-button').forEach(button => {
+            // Remove active class from all sidebar items
+            document.querySelectorAll('.sidebar-item').forEach(button => {
                 button.classList.remove('active');
             });
             
@@ -598,17 +866,26 @@
         
         // Load SEC filings
         async function loadSecFilings() {
+            const ticker = document.getElementById('globalTickerSelect').value;
             const days = document.getElementById('secTimeRange').value;
             const container = document.getElementById('secTable');
             
-            container.innerHTML = '<div class="loading">Loading SEC filings...</div>';
+            if (!ticker) {
+                alert('Please select a company first');
+                return;
+            }
+            
+            container.innerHTML = '<div class="loading">Loading Form 4 filings...</div>';
             
             try {
                 const response = await fetch(`/api/sec-filings?days=${days}`);
                 const filings = await response.json();
                 
-                if (filings.length === 0) {
-                    container.innerHTML = '<div class="loading">No SEC filings found for this period</div>';
+                // Filter by selected ticker
+                const tickerFilings = filings.filter(f => f.ticker === ticker);
+                
+                if (tickerFilings.length === 0) {
+                    container.innerHTML = '<div class="loading">No Form 4 filings found for this period</div>';
                     return;
                 }
                 
@@ -630,7 +907,7 @@
                         <tbody>
                 `;
                 
-                filings.forEach(filing => {
+                tickerFilings.forEach(filing => {
                     const date = filing.timestamp ? filing.timestamp.split('T')[0] : 'N/A';
                     const link = filing.link ? `<a href="${filing.link}" target="_blank" class="event-link">View Filing</a>` : 'N/A';
                     
@@ -670,8 +947,14 @@
         
         // Load FDA events
         async function loadFdaEvents() {
+            const ticker = document.getElementById('globalTickerSelect').value;
             const days = document.getElementById('fdaTimeRange').value;
             const container = document.getElementById('fdaTable');
+            
+            if (!ticker) {
+                alert('Please select a company first');
+                return;
+            }
             
             container.innerHTML = '<div class="loading">Loading FDA events...</div>';
             
@@ -679,7 +962,10 @@
                 const response = await fetch(`/api/fda-events?days=${days}`);
                 const events = await response.json();
                 
-                if (events.length === 0) {
+                // Filter by selected ticker
+                const tickerEvents = events.filter(e => e.ticker === ticker);
+                
+                if (tickerEvents.length === 0) {
                     container.innerHTML = '<div class="loading">No FDA events found for this period</div>';
                     return;
                 }
@@ -699,7 +985,7 @@
                         <tbody>
                 `;
                 
-                events.forEach(event => {
+                tickerEvents.forEach(event => {
                     const date = event.timestamp ? event.timestamp.split('T')[0] : 'N/A';
                     const link = event.link ? `<a href="${event.link}" target="_blank" class="event-link">View Details</a>` : 'N/A';
                     const sourceClass = event.source.toLowerCase().replace('-', '-');
@@ -727,8 +1013,14 @@
         
         // Load NHTSA recalls
         async function loadNhtsaRecalls() {
+            const ticker = document.getElementById('globalTickerSelect').value;
             const days = document.getElementById('nhtsaTimeRange').value;
             const container = document.getElementById('nhtsaTable');
+            
+            if (!ticker) {
+                alert('Please select a company first');
+                return;
+            }
             
             container.innerHTML = '<div class="loading">Loading vehicle recalls...</div>';
             
@@ -736,7 +1028,10 @@
                 const response = await fetch(`/api/nhtsa-recalls?days=${days}`);
                 const recalls = await response.json();
                 
-                if (recalls.length === 0) {
+                // Filter by selected ticker
+                const tickerRecalls = recalls.filter(r => r.ticker === ticker);
+                
+                if (tickerRecalls.length === 0) {
                     container.innerHTML = '<div class="loading">No vehicle recalls found for this period</div>';
                     return;
                 }
@@ -755,7 +1050,7 @@
                         <tbody>
                 `;
                 
-                recalls.forEach(recall => {
+                tickerRecalls.forEach(recall => {
                     const date = recall.timestamp ? recall.timestamp.split('T')[0] : 'N/A';
                     const link = recall.link ? `<a href="${recall.link}" target="_blank" class="event-link">View Recall</a>` : 'N/A';
                     

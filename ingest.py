@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Data Ingestion Pipeline for Company Catalyst Events
-Two-stage: backfill (12-24 months) + incremental (daily)
-"""
 
 import sqlite3
 import requests
