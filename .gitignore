@@ -66,3 +66,6 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Environment variables with secrets
+.env

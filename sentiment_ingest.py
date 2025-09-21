@@ -13,14 +13,18 @@ from typing import List, Dict, Optional
 import time
 import re
 import os
+from dotenv import load_dotenv
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
 import pandas as pd
 
+# Load environment variables
+load_dotenv()
+
 # Configuration
-REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID", "nPyq3pZG0_fpimMxkiunmw")
-REDDIT_CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET", "9zpMbT56sSjxExRlK3oPlX4-q9ZE-g")
-REDDIT_USER_AGENT = os.getenv("REDDIT_USER_AGENT", "pmf-nlp-app")
+REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
+REDDIT_CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET")
+REDDIT_USER_AGENT = os.getenv("REDDIT_USER_AGENT", "catalyst-dashboard-app")
 
 class SentimentAnalyzer:
     def __init__(self, db_path='events.db'):
